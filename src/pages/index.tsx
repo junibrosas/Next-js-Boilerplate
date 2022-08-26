@@ -1,10 +1,20 @@
+import type { Review } from 'mocks/types';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import { Meta } from '@/layouts/Meta';
 import { Main } from '@/templates/Main';
 
 const Index = () => {
   const router = useRouter();
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+
+  const handleGetReviews = () => {
+    // Client-side request are mocked by `mocks/browser.ts`.
+    fetch('/api/reviews')
+      .then((res) => res.json())
+      .then(setReviews);
+  };
 
   return (
     <Main
@@ -179,6 +189,21 @@ const Index = () => {
         </a>{' '}
         on our website to support this project.
       </p>
+
+      <h2>Reviews</h2>
+      <div>
+        <button onClick={handleGetReviews}>Load reviews</button>
+        {reviews && (
+          <ul>
+            {reviews.map((review: Review) => (
+              <li key={review.id}>
+                <p>{review.text}</p>
+                <p>{review.author}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </Main>
   );
 };
